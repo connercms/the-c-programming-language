@@ -1,0 +1,33 @@
+#include <stdio.h>
+
+
+int main()
+{
+	int c;
+	int nchars[128];
+
+	for (int i = 0; i < 128; ++i)
+		nchars[i] = 0;
+
+	while ((c = getchar()) != EOF)
+	{
+		if (c < 128)
+			++nchars[c];
+	}
+
+	for (int i = 0; i < 128; ++i)
+	{
+		if (nchars[i] > 0)
+		{
+			putchar(i);
+			printf(": ");
+			for (int x = 0; x < nchars[i]; ++x)
+			{
+				putchar('*');
+			}
+			putchar('\n');
+		}
+	}
+
+	return 0;
+}
