@@ -1,0 +1,88 @@
+
+#include <stdio.h>
+#define OUT 0
+#define IN 1
+
+int main()
+{
+	int c, state, secondchar, tabs;
+	state = OUT;
+
+	while ((c = getchar()) != EOF)
+	{
+		if (c == '/')
+		{
+			int nextc = getchar(); 
+			if (state == OUT)
+			{
+				if (nextc == '/' || nextc == '*')
+				{
+					state = IN;
+					secondchar = nextc;
+				}
+				else
+				{
+					putchar(c);
+					putchar(nextc);
+				}
+			}
+			else if (state == IN)
+			{
+				if (nextc == '*' && secondchar == '*')
+				{
+					state = OUT;
+					tabs = 0;
+				}
+			}
+		}
+		else if (c == '\t')
+		{
+			++tabs;
+		}
+		else if (c == '*')
+		{
+			int nextc = getchar();
+			if (state == IN && nextc == '/')
+			{
+				state = OUT;
+				int escapec = getchar();
+				if (escapec != '\n')
+				{
+					putchar(escapec);
+				}
+			}
+			else if (state == OUT)
+			{
+				putchar(c);
+				putchar(nextc);
+			}
+		}
+		else if (c == '\n')
+		{
+			if (state == OUT)
+			{
+				putchar(c);
+				tabs = 0;
+			}
+			else if (secondchar == '/')
+			{
+				state = OUT;
+				tabs = 0;
+			}
+		}
+		else
+		{
+			if (state == OUT)
+			{
+				while (tabs > 0)
+				{
+					putchar('\t');
+					--tabs;
+				}
+				putchar(c);
+			}
+		}
+	}
+
+	return 0;
+}
