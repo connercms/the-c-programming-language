@@ -12,7 +12,6 @@
 
 int main()
 {
-
     printf("LIMITS.H\n");
     printf("CHAR_MIN %d, CHAR_MAX %d\n", CHAR_MIN, CHAR_MAX);
     printf("UCHAR_MIN 0, UCHAR_MAX %d\n", UCHAR_MAX);
@@ -28,7 +27,9 @@ int main()
     putchar('\n');
 
     /**
-     * Compute by adding until overflow. This is the min, then subtract one to overflow back to the max.
+     * To compute signed, start at 1 and add 1 until overflow.
+     * This is the min.
+     * Subtract one to overflow back to the max.
      */
     printf("COMPUTED\n");
 
