@@ -4,19 +4,13 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
-/**
- * AF_INET = Address Family: Internet
- */
+#include "./network.h"
 
 int main()
 {
-    // 1. Create the socket
-    /**
-     * Returns a file descriptor for the new socket,
-     * or -1 for errors.
-     */
+    struct sockaddr_in server_addr, client_addr;
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    char buffer[1024];
 
     if (server_fd < 0)
     {
@@ -24,20 +18,11 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    // 2. Bind the socket to an IP address and port
-    struct sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    /**
-     * htons: host to network short
-     * converts the port number to be stored big endian.
-     * that is, the MSB first
-     *  */
-    address.sin_port = htons(12000);
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(serverport);
 
-    int addrlen = sizeof(address);
-
-    if (bind(server_fd, (struct sockaddr *)&address, addrlen) < 0)
+    if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
         perror("Bind failed");
         exit(EXIT_FAILURE);
@@ -50,23 +35,22 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    // 4. Accept a client connection
-    int new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
+    // memset(&client_addr, 0, sizeof(client_addr));
+    memset(&server_addr, 0, sizeof(server_addr));
+    socklen_t addr_size = sizeof(server_addr);
+    int socketfd = accept(server_fd, (struct sockaddr *)&client_addr, &addr_size);
+    memset(&buffer, 0, 1024);
+    recv(socketfd, buffer, 1024, 0);
+    // recvfrom(server_fd, buffer, 1024, 0, (struct sockaddr *)&server_addr, &addr_size);
 
-    if (new_socket < 0)
-    {
-        perror("Accept failed");
-        exit(EXIT_FAILURE);
-    }
+    printf("[+] Received data: %s\n", buffer);
 
-    // 5. Receive the client's message and send it back
-    char buffer[1024] = {0};
-    int val = read(new_socket, buffer, 1024);
-    printf("Client %s\n", buffer);
-    send(new_socket, buffer, strlen(buffer), 0);
+    char message[] = "Hello from server";
+    memset(&buffer, 0, 1024);
+    strcpy(buffer, message);
+    printf("[>] Sending data: %s\n", message);
+    sendto(socketfd, buffer, 1024, 0, (struct sockaddr *)&client_addr, addr_size);
 
-    // Close the socket connection
-    close(new_socket);
     close(server_fd);
 
     return EXIT_SUCCESS;
