@@ -27,8 +27,12 @@ int bitcount(unsigned x)
     // If the result is 1 (true), it adds to the counter.
     // Shift bits of x right until and repeat until x is 0.
     for (b = 0; x != 0; x >>= 1)
+    {
         if (x & 01)
+        {
             b++;
+        }
+    }
 
     return b;
 }
